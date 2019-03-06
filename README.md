@@ -51,5 +51,86 @@ Sometimes, the user has no history of likes or preferences. In these cases somet
 
 - The other issue is the lack of customer explicit rating or thumbs up or down. In this cases we need to use implicit rating data, such as watching times, site navigation, etc. implicit feedbacks are much more available. 
 If we have enough information, we can make a model to predict explicit rating of the user, based on the implicit interactions. Then we can feed these explicit ratings to feed the recommendation engine.
-     
- 
+
+##### Embedding:
+A map from our collection of items to some limited dimensional vector space.
+##### Similarity Measure:
+A metric  for items in an embedding space. It shows how close two items are in embedding space.
+
+##### Dot Product: 
+One of the most popular similarity measures, is dot product. 
+(photo: dot-product.jpg)
+
+##### Cosine similarity:
+Another type of the similarity measures is Cosine Similarity.
+(photo: cosine-similarity.jpg)
+
+##### Building a user vector:
+Let's imagine we have a user who has ranked 3 movies as we see in the photo user-vector-1.jpg.
+
+As we see in the photo, for each movie we have already some categories. these categories are genres in movies example, but in HQ example, they can be the property type.
+
+In the next photo user-vector-2.jpg we see the 3 ranked movies and their features.
+
+Now we can make the __User Feature Matrix__ as we see in the photo user-feature-vector.jpg.
+
+We can multiply item by item the users likes to the Use Feature Matrix and get the sum of each column, and finally Normalize the results and finally we get __User Feature Vector__ which is seen in the photo user-feature-vector-final.jpg.
+
+It shows that comedy has been the most desired movies genre by this user.
+
+
+Now we can use the similarity measure, to recommend unseen movies. In order to do this we can calculate the dot product between the similarity measure and the remaining movies.
+(photo: dot-product-similarity-unseen-items.jpg)
+
+The movie with the highest similarity measure would be our top recommendation. We do the component-wise multiplication between the similarity measure which is a vector with the matrix of remaining movies and sum up the results for each movie, then the highest value would be the top movies.
+
+(photo: dot-product-results.jpg)
+
+#### Scaling content-based recommendation: recommend to multiple users at the time:
+
+We want to see how TensorFLow will make the recommendation for many users at the time.
+
+First we make sure we have both user_item_rating and item_features matrices ready.
+
+(photo: user-item-vs-item-feature.jpg )
+
+Having these two matrices, we will have __Weighted Feature Matrix__ for each user. in the photo we will see this matrix for user 1 (photo: user1-weighted-featrue-matrix.jpg)
+
+Using tensorflow we can stack all these weighted feature matrices together using tf.stack().
+
+__Improtant:__ The shape of the stack will be (users, movies, features).
+
+
+The next step is finding __User Feature Tensor.__ For this we sum across the feature columns amd normalize them as before. 
+(photo: user-feature-tensor.jpg)  
+
+#### TensorFlow code to calculate the user feature tensor:
+
+1- defining user_movies and movies_feats matrices as two constants. (photo: content-based-tensorflow-code-1.jpg)
+
+2- we build a list of the weighted feature matrices for each user. 
+
+3- Then we stack them up to build a stack of all weighted feature matrices. (photo: stacking-weighted-featured-matrices.jpg)
+
+4- Then we need to make __users features tensor__ which is calculating user_movie_feature_sum and user_movie_feature_total and divide them to each other to normalize, then stack them up. (photo: user_features_tensor.jpg )
+
+Now we have the final user features tensor: user_features_tensor_final.JPG
+
+__Final Step:__ To find the recommendations, we need to dot product user_feature_vector to movie_feature_vector. 
+(photo: final_content_based_recommendation.jpg )
+
+6 - In TF we will map a lambda function to all the users at the same time, to apply the dot production to them at once and the variable called user_ratings would be a list of all users' ratings for each movie. 
+(photo: content_based_all_users_recommendation.jpg) 
+
+we need to compare the all_user_ratings which is all the users with all their rankings, to the original user_movie matrix to see which movie to recommend to which user.
+
+(photo: all_user_ratings_vs_original_user_movie_matrix.jpg)
+
+Because there are some of the movies already seen, we need to mask them in order for comparing only the unseen movies.
+
+
+This masking is done by tf.where() that applies the function only on movie_user_cell that don't have any value. 
+(photo: tf_where_masking values.jpg)
+
+and finally we have this: content_based_ultimate_recommendations.jpg
+
