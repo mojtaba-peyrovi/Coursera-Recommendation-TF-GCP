@@ -134,3 +134,104 @@ This masking is done by tf.where() that applies the function only on movie_user_
 
 and finally we have this: content_based_ultimate_recommendations.jpg
 
+#### Using Neural Networks:
+
+There is another approach to make content-based filtering. which is using supervised machine learning. This is how it works. 
+
+- Given the User Feature and Movie Feature, we can predict the star rating that a user might give to a movie.
+
+- or Given user features and movie features, we can predict which movies the user will watch next.
+
+__Imoportant:__ For the predictive model, we need both user features (location, language, gender, etc.) and movie featureS(genre, duration, director, etc.).
+
+```
+When we want to convert categorical to numerical, 
+if the number of categories change overtime, 
+we can use hash buckets. in this code we see how we can use hash buckets in TF
+```
+
+#### Lab: Buliding a content-based recommendation engine using neural network:
+
+We will use the features of the current article being read by a user, on the Karier website, to model what would be the next article the user would want to read. 
+
+It is going to be a classification model with multi output label.
+
+The input of our model will be the features of the current article, and the output will be any other possible articles in the database.
+
+This lab has two notebooks:
+
+1) Create Dataset notebook: will build up test-train datasets.
+2) Content-based Filtering, that contains the actual neural network.
+
+##### What is Farm_Fingerprint() in SQL?
+
+
+### ALS, a matrix factorization algorithm for collaborative filtering:
+
+In this episode we learn how to make collaborative filtering recommendation system, using __WALS(Weighted Alternating Least Squares)__.
+
+__Embedding:__ An embedding is a relatively low-dimensional __space__ into which you can translate high-dimensional vectors. Embeddings make it easier to do machine learning on large inputs like sparse vectors representing words.
+
+#### What can we do with Embedding space?__
+
+When we have items that a user likes, we can search an embedding space for similar items. In other words, items in the local neighborhood of the item factor embedding space.
+
+using some distance metrics. It is great because it doesn't need data about other users, and can recommend niche items. However, it required domain knowledge.
+
+__Interesting example of recomendation system (Collaborative filtering:__
+
+A book called "Touching the void" was published in 1988 and didn't sell much. Another book called "Into thin air" was published in 1999 and was the best seller. A seller found out that many people read the second book, also bought the first book. Then started to recommend the first book to all buyers of the second book. Now, the sales of the first book has taken off and outsales the second book by double.
+
+
+- Unlike content based recommendation systems, that uses embedding space between items only, collaborative filtering we are learning where users and items fit within a common embedding space along dimensions they have in common.
+
+- each item has a vector within its embedding space that describes the amount of expression of each dimension, each user also has a vector that shows how strong their preference is, for each dimension. 
+
+For now, let's keep it simple and look at one dimension. and later we can implement multi-dimensional embedding.
+
+When we have one dimension, like child-adult dimension, we compare movies one by one and put them in a relative position with others, and it creates a spectrum of movies. high minus values show most childish, and high positive ones show most adult movies. 
+
+(photo: one-dimensional-embedding.jpg). This was we can calculate the distance between two movies to understand how similar they are.
+
+Here is so easy if there is one dimension. we can just pick those next to each other as similar. but in reality there are more than one dimensions, and two movies can be so similar in one dimension but so far apart in another dimension.
+
+__(Blockboster va arthouse movies):__ Blockbuster means the movies that make so much commercial success, and arthouse movies are the ones with low sale and investors hesitate to invest it them.
+
+- Now we want to make the comparison in two dimensions. It makes the embedding space extremely larger and sparser. As we can see in the photo: two-dimenstional-embedding-space.jpg)
+
+Based on the two dimensional embedding, we can see that the most similar movie to Shrek is not "The triplets of..." anymore. Now, Harry Potter is closer to the Shrek. 
+
+- Lets say we know where the cordinate values for each user will locate along the two dimensions. then we will have this photo: user-item-dot-production.jpg. The value of __ij__ th cell will be the result of dot production between ith user and jth item.
+
+- In order to find what movie to recommend to a user, we need to see where the user will be locating in the coordinate system. 
+ (photo: two-dimensions-user-item-dot-production.jpg ). for doing that:
+ `we calculate the dot production between the user and each movie, and return the top highest values as the recommendation. as we see in the photo.`
+ 
+ - This approach is similar to when we want to see which item is the most similar to a specific item. `in this case, instead of calculating the dot production of the user with all items, we calculate the dot production of the item we want and other items`
+ 
+ __Latent Variables(features):__  latent variables are variables that are not directly observed but are rather inferred (through a mathematical model) from other variables that are observed (directly measured).
+
+Here is how we recommend: (factorization-user-item.jpg)
+
+__Important:__ Becuase we want the closer movie, we need to calculate the dot productions and pick the one with the lowest absolute value as the best recommendation.
+
+What machine learning can do, is to help us find the item factors, and user factors matrices out of the extremely sparse user-item(user interaction) matrix.
+
+Because it is an approximation, we need to minimize the squred error between the original user interaction matrix and the production of two factor matrices.
+
+There are several ways to minimize the squared error. 
+
+`1- Stochastic Gradiant Descent(SGD):` 
+It has pros and cons that we can see here: SGD-pros-cons.jpg
+
+`2- Alternating Least Squares (ALS):`
+It works so much better for recommendation systems. here is pros and cons: ALS-pros-cons.JPG
+
+The big advantage of ALS, is that we don't replace missing data with 0. because they can be non-zero in fact but we repalce them with zero since they are missing but doesn't mean they are really zero. ALS doesn't do that. It can just ignore them instead. So, the results would be more accurate.
+
+However, we can make ALS even better, by assigning some weights to the missing values instead of ignoring them.
+
+(photo: wals.jpg)
+
+
+
