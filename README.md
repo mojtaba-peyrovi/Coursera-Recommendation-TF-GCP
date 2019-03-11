@@ -233,5 +233,47 @@ However, we can make ALS even better, by assigning some weights to the missing v
 
 (photo: wals.jpg)
 
+#### Wals Estimator:
 
+There is a pre-built wals estimator available. We just need to make sure the structure of the data we feed into the model, is correct. then the model will take care of the rest.
+
+For feeding data, we need to use __training_input_fn()__. (photo: train_input_fn.jpg)
+
+__INTERESTING:__
+In the WALS estimator model, we can define the weight for specific entries if we want. One reason can be to encode our profit margin on items and use that as a weight. `THis way more profitable items will be recommended more.` We can just add profit margin as a new feature.
+
+Note that these row_weights anc col_weights are both from a batch not all the rows. (It will be explained later in this course.)
+
+(photo: column_row_wights.jpg)
+
+The ALS algorithm, can calculate the ratings inside the ratings sparse matrix, by multiplying U and V vectors(which are user features, and item features.)
+
+(photo: als-iterative-algorithm.jpg)
+ 
+ - In some cases as we see in the following photo, the numbers are too big to save, and it will be a waste of storage and makes the process slower. In this case, we can create a mapping. 
+ 
+ like photo: (mapping-1.jpg, mapping-2.jpg)
+ 
+ This mapping has to be saved in persistent storage because we need to use it always.
+ 
+ - there is a possibility that we distribute our data into clusters and not only one machine.
+ 
+ __Grammian Matrix G:__
+ 
+ It is made by calculating the determinant of the matrix inner product X transpose X.
+ (photo: grammian.jpg)
+ 
+ - Luckily TensorFlow has done most of the work for us to map the the table from the storage to user_item interaction matrix and also implementing WALS algorithm. We just need to connect some of the piping and the estimator will take care of the rest
+ 
+ There are some pre-processing to build the sparse matrix. we can see an example here: WALS_preprocessing_example.jpg
+ 
+ __TFRecodrd:__ It is a datatype used by tensorflow that is most efficient and supports hierarchical data.
+ 
+ here is the code to feed the preprocessed data into WALS: wals_matrix_factorization_estimator.jpg
+ 
+ __Cold Start Problem:__ When the system is recently launched and there is not much interaction built yet by users, there won't be so much luck for collaborative filtering. Instead, the recommendation engine has to b able to use content based algorithm instead. 
+ (photo: hybrid_system_intro.jpg)
+ 
+ 
+ 
 
